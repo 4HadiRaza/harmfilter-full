@@ -2,13 +2,13 @@ import { getUsers } from "@/app/actions/users";
 import { getCurrentAdmin } from "@/app/actions/auth";
 import { UsersTable } from "@/components/users/users-table";
 
-export default async function UsersPage({
-  searchParams,
-}: {
-  searchParams: { [key: string]: string | undefined };
+export default async function UsersPage(props: {
+  searchParams: Promise<{ [key: string]: string | undefined }>;
 }) {
   const admin = await getCurrentAdmin();
   if (!admin) return null;
+
+  const searchParams = await props.searchParams;
 
   const filters = {
     search: searchParams.search,

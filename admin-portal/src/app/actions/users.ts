@@ -44,6 +44,15 @@ export async function getUsers(filters?: {
           .catch(() => 0),
       ]);
 
+      const rawQuizProgress = d.quizProgress ?? {};
+      const quizProgress: Record<string, any> = {};
+      for (const [key, val] of Object.entries(rawQuizProgress)) {
+        quizProgress[key] = { ...((val as any) || {}) };
+        if (quizProgress[key].completedAt?.toDate) {
+          quizProgress[key].completedAt = quizProgress[key].completedAt.toDate();
+        }
+      }
+
       return {
         uid: doc.id,
         displayName: d.displayName ?? "User",
@@ -53,7 +62,7 @@ export async function getUsers(filters?: {
         points: d.points ?? 0,
         joinedAt: d.joinedAt?.toDate?.() ?? new Date(),
         lastActivityDate: d.lastActivityDate?.toDate?.(),
-        quizProgress: d.quizProgress ?? {},
+        quizProgress,
         banned: d.banned ?? false,
         bannedAt: d.bannedAt?.toDate?.(),
         bannedBy: d.bannedBy,
@@ -108,6 +117,15 @@ export async function getUserDetail(uid: string): Promise<{
     adminDb.collection("reports").where("reportedBy", "==", uid).count().get().then((s) => s.data().count),
   ]);
 
+  const rawQuizProgress = d.quizProgress ?? {};
+  const quizProgress: Record<string, any> = {};
+  for (const [key, val] of Object.entries(rawQuizProgress)) {
+    quizProgress[key] = { ...((val as any) || {}) };
+    if (quizProgress[key].completedAt?.toDate) {
+      quizProgress[key].completedAt = quizProgress[key].completedAt.toDate();
+    }
+  }
+
   const user = {
     uid: userDoc.id,
     displayName: d.displayName ?? "User",
@@ -117,7 +135,7 @@ export async function getUserDetail(uid: string): Promise<{
     points: d.points ?? 0,
     joinedAt: d.joinedAt?.toDate?.() ?? new Date(),
     lastActivityDate: d.lastActivityDate?.toDate?.(),
-    quizProgress: d.quizProgress ?? {},
+    quizProgress,
     banned: d.banned ?? false,
     bannedAt: d.bannedAt?.toDate?.(),
     bannedBy: d.bannedBy,

@@ -5,15 +5,14 @@ import { notFound } from "next/navigation";
 import Link from "next/link";
 import { ChevronLeft } from "lucide-react";
 
-export default async function UserDetailPage({
-  params,
-}: {
-  params: { uid: string };
+export default async function UserDetailPage(props: {
+  params: Promise<{ uid: string }>;
 }) {
   const admin = await getCurrentAdmin();
   if (!admin) return null;
 
-  const data = await getUserDetail(params.uid);
+  const resolvedParams = await props.params;
+  const data = await getUserDetail(resolvedParams.uid);
   if (!data.user) {
     notFound();
   }

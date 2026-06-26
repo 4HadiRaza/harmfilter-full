@@ -2,13 +2,13 @@ import { getPosts } from "@/app/actions/posts";
 import { getCurrentAdmin } from "@/app/actions/auth";
 import { PostsTable } from "@/components/posts/posts-table";
 
-export default async function PostsPage({
-  searchParams,
-}: {
-  searchParams: { [key: string]: string | undefined };
+export default async function PostsPage(props: {
+  searchParams: Promise<{ [key: string]: string | undefined }>;
 }) {
   const admin = await getCurrentAdmin();
   if (!admin) return null;
+
+  const searchParams = await props.searchParams;
 
   const filters = {
     label: searchParams.label,
