@@ -3,13 +3,13 @@ import { getCurrentAdmin } from "@/app/actions/auth";
 import { ModerationTable } from "@/components/moderation/moderation-table";
 import { ConsensusBanner } from "@/components/moderation/consensus-banner";
 
-export default async function ModerationPage({
-  searchParams,
-}: {
-  searchParams: { [key: string]: string | undefined };
+export default async function ModerationPage(props: {
+  searchParams: Promise<{ [key: string]: string | undefined }>;
 }) {
   const admin = await getCurrentAdmin();
   if (!admin) return null;
+
+  const searchParams = await props.searchParams;
 
   const filters = {
     currentFlag: searchParams.currentFlag,

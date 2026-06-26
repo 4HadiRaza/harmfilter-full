@@ -9,6 +9,10 @@ const serviceAccount: ServiceAccount = {
   privateKey: process.env.FIREBASE_PRIVATE_KEY?.replace(/\\n/g, "\n"),
 };
 
+console.log("[DEBUG] Firebase Admin Email:", serviceAccount.clientEmail);
+console.log("[DEBUG] Firebase Admin Key length:", serviceAccount.privateKey?.length);
+console.log("[DEBUG] Key starts with:", serviceAccount.privateKey?.substring(0, 30));
+
 let app;
 if (!getApps().length) {
   try {
