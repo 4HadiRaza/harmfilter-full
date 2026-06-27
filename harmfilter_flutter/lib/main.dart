@@ -6,9 +6,11 @@ import 'package:harmfilter_flutter/services/theme_service.dart';
 import 'package:harmfilter_flutter/services/auth_service.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:harmfilter_flutter/widgets/hf_theme.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  await dotenv.load(fileName: ".env");
 
   // Initialize Firebase with platform-specific options
   if (kIsWeb) {

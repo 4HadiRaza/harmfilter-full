@@ -5,6 +5,8 @@ import 'package:harmfilter_flutter/widgets/hf_button.dart';
 import 'package:harmfilter_flutter/widgets/hf_card.dart';
 import 'package:harmfilter_flutter/widgets/hf_input.dart';
 import 'package:harmfilter_flutter/widgets/hf_theme.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:google_generative_ai/google_generative_ai.dart';
 
 class ChatScreen extends StatefulWidget {
   const ChatScreen({super.key});
@@ -19,6 +21,31 @@ class _ChatScreenState extends State<ChatScreen> {
   final List<Map<String, dynamic>> _messages = [];
   bool _isTyping = false;
 
+  late final GenerativeModel _model;
+  late final ChatSession _chatSession;
+
+  @override
+  void initState() {
+    super.initState();
+    final apiKey = dotenv.env['GEMINI_API_KEY'];
+    if (apiKey == null) {
+      debugPrint('No GEMINI_API_KEY found in .env');
+    }
+    _model = GenerativeModel(
+      model: 'gemini-flash-latest',
+      apiKey: apiKey ?? '',
+      systemInstruction: Content.system(
+          'You are Compassion Coach, a warm, empathy-focused chatbot. '
+          'Your goal is to help users understand why certain language is harmful and constructively help them rewrite harmful text. '
+          'CRITICAL RULE: You must automatically mirror the user\'s language. '
+          'If the user writes in English, respond ONLY in English. '
+          'If the user writes in Roman Urdu, respond ONLY in Roman Urdu. '
+          'Never mix the two languages in the same response. '
+          'Keep your tone non-judgmental, warm, and helpful. Always address users respectfully.'),
+    );
+    _chatSession = _model.startChat();
+  }
+
   final List<String> _quickReplies = [
     "Suggest a rewrite",
     "Why is this harmful?",
@@ -26,7 +53,7 @@ class _ChatScreenState extends State<ChatScreen> {
     "Teach me about empathy",
   ];
 
-  void _handleSend() {
+  Future<void> _handleSend() async {
     if (_textController.text.trim().isEmpty) return;
 
     final userMessage = {
@@ -45,11 +72,12 @@ class _ChatScreenState extends State<ChatScreen> {
     _textController.clear();
     _scrollToBottom();
 
-    // Mock response delay
-    Future.delayed(const Duration(seconds: 1), () {
+    try {
+      final response = await _chatSession.sendMessage(Content.text(input));
+      final responseContent = response.text ?? "I'm sorry, I didn't understand that.";
+      
       if (!mounted) return;
 
-      final responseContent = _getMockResponse(input);
       final botMessage = {
         'id': DateTime.now().toString(),
         'role': 'assistant',
@@ -62,24 +90,20 @@ class _ChatScreenState extends State<ChatScreen> {
         _isTyping = false;
       });
       _scrollToBottom();
-    });
-  }
-
-  String _getMockResponse(String input) {
-    final lower = input.toLowerCase();
-    if (lower.contains('rewrite') || lower.contains('rephrase')) {
-      return "I'd be happy to help you rephrase that! Could you share the text you'd like to improve? I'll suggest more constructive ways to express the same idea.";
+    } catch (e) {
+      if (!mounted) return;
+      setState(() {
+        _messages.add({
+          'id': DateTime.now().toString(),
+          'role': 'assistant',
+          'content': "Kuch masla ho gaya hai (Something went wrong). Please try again later.",
+          'timestamp': DateTime.now(),
+        });
+        _isTyping = false;
+      });
+      _scrollToBottom();
+      debugPrint('Error from Gemini: $e');
     }
-    if (lower.contains('harmful') || lower.contains('why')) {
-      return "Language can be harmful when it: 1) Dehumanizes groups of people, 2) Incites violence or exclusion, 3) Reinforces harmful stereotypes, or 4) Dismisses others' humanity. Would you like specific examples?";
-    }
-    if (lower.contains('disagree') || lower.contains('argument')) {
-      return "You can disagree strongly while being respectful! Try: 1) Focus on actions, not character ('I disagree with this approach' vs 'You're an idiot'), 2) Use 'I' statements ('I see it differently'), 3) Acknowledge their perspective first ('I understand where you're coming from, but...'), 4) Suggest alternatives instead of just criticizing.";
-    }
-    if (lower.contains('empathy') || lower.contains('compassion')) {
-      return "Empathy is about understanding others' feelings and perspectives, even when we disagree. Try to: 1) Consider their experiences and context, 2) Separate the person from their actions, 3) Ask questions to understand better, 4) Recognize our shared humanity. Remember: empathy doesn't mean agreement!";
-    }
-    return "That's a great question! I'm here to help you communicate with more compassion. Could you tell me more about what you're trying to express or what situation you're facing?";
   }
 
   void _scrollToBottom() {
