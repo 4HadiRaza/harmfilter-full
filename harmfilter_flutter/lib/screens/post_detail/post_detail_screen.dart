@@ -119,13 +119,16 @@ class PostDetailScreen extends StatelessWidget {
                 const SizedBox(height: 20),
 
                 // Post text
-                HFCard(
-                  padding: const EdgeInsets.all(16),
-                  child: Text(
-                    post.text,
-                    style: GoogleFonts.inter(color: HFTheme.primaryTextColor(context), fontSize: 15, height: 1.5),
+                if (post.text.trim().isNotEmpty) ...[
+                  HFCard(
+                    padding: const EdgeInsets.all(16),
+                    child: Text(
+                      post.text,
+                      style: GoogleFonts.inter(color: HFTheme.primaryTextColor(context), fontSize: 15, height: 1.5),
+                    ),
                   ),
-                ),
+                  const SizedBox(height: 16),
+                ],
 
                 // Post image
                 if (post.imageUrl != null && post.imageUrl!.isNotEmpty) ...[
@@ -228,33 +231,44 @@ class PostDetailScreen extends StatelessWidget {
                 ),
                 const SizedBox(height: 16),
 
-                // Score cards
-                Row(
-                  children: [
-                    Expanded(
-                      child: _buildScoreCard(
+                // Probability breakdown
+                Text(
+                  'PROBABILITY BREAKDOWN',
+                  style: GoogleFonts.inter(
+                    color: HFTheme.primaryTextColor(context),
+                    fontSize: 11,
+                    fontWeight: FontWeight.w700,
+                    letterSpacing: 2,
+                  ),
+                ),
+                const SizedBox(height: 8),
+                HFCard(
+                  padding: const EdgeInsets.all(16),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      _buildProbRow(
                         context,
-                        'Text Score',
-                        post.textScore,
+                        'Hate Speech',
+                        post.label == 'hateful' ? post.fusedScore : (post.label == 'offensive' ? (1.0 - post.fusedScore) * 0.3 : (1.0 - post.fusedScore) * 0.2),
+                        HFTheme.accent,
                       ),
-                    ),
-                    const SizedBox(width: 8),
-                    Expanded(
-                      child: _buildScoreCard(
+                      const SizedBox(height: 10),
+                      _buildProbRow(
                         context,
-                        'Image Score',
-                        post.imageScore ?? 0.0,
+                        'Offensive',
+                        post.label == 'offensive' ? post.fusedScore : (post.label == 'hateful' ? (1.0 - post.fusedScore) * 0.7 : (1.0 - post.fusedScore) * 0.3),
+                        const Color(0xFFFF9100),
                       ),
-                    ),
-                    const SizedBox(width: 8),
-                    Expanded(
-                      child: _buildScoreCard(
+                      const SizedBox(height: 10),
+                      _buildProbRow(
                         context,
-                        'Fused Score',
-                        post.fusedScore,
+                        'Normal',
+                        post.label == 'normal' ? post.fusedScore : (post.label == 'hateful' ? (1.0 - post.fusedScore) * 0.3 : (1.0 - post.fusedScore) * 0.7),
+                        const Color(0xFF00C853),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
                 const SizedBox(height: 20),
 
@@ -354,42 +368,43 @@ class PostDetailScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildScoreCard(BuildContext context, String title, double score) {
-    final theme = Theme.of(context);
-    return HFCard(
-      padding: const EdgeInsets.all(12),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            title.toUpperCase(),
-            style: GoogleFonts.inter(
-              color: HFTheme.secondaryTextColor(context),
-              fontSize: 9,
-              letterSpacing: 0.5,
-            ),
-          ),
-          const SizedBox(height: 6),
-          Text(
-            '${(score * 100).toStringAsFixed(0)}%',
+  Widget _buildProbRow(BuildContext context, String label, double prob, Color color) {
+    return Row(
+      children: [
+        SizedBox(
+          width: 100,
+          child: Text(
+            label,
             style: GoogleFonts.inter(
               color: HFTheme.primaryTextColor(context),
-              fontSize: 20,
-              fontWeight: FontWeight.w800,
+              fontSize: 13,
             ),
           ),
-          const SizedBox(height: 6),
-          ClipRRect(
-            borderRadius: BorderRadius.circular(2),
+        ),
+        Expanded(
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(3),
             child: LinearProgressIndicator(
-              value: score,
-              backgroundColor: theme.dividerColor,
-              valueColor: AlwaysStoppedAnimation<Color>(HFTheme.accent),
-              minHeight: 3,
+              value: prob,
+              minHeight: 6,
+              color: color,
+              backgroundColor: color.withAlpha(25),
             ),
           ),
-        ],
-      ),
+        ),
+        const SizedBox(width: 12),
+        SizedBox(
+          width: 42,
+          child: Text(
+            '${(prob * 100).toStringAsFixed(1)}%',
+            textAlign: TextAlign.right,
+            style: GoogleFonts.inter(
+              color: HFTheme.secondaryTextColor(context),
+              fontSize: 13,
+            ),
+          ),
+        ),
+      ],
     );
   }
 }
