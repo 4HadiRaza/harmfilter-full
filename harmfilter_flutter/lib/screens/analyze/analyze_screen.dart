@@ -368,8 +368,7 @@ class _AnalyzeScreenState extends State<AnalyzeScreen>
                         child: Image.memory(
                           _selectedImageBytes!,
                           width: double.infinity,
-                          height: 180,
-                          fit: BoxFit.cover,
+                          fit: BoxFit.contain,
                         ),
                       ),
                       Positioned(
