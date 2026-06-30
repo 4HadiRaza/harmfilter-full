@@ -35,3 +35,6 @@ yarn-error.log*
 
 # Other potential root-level generated files
 *.log
+
+#ML folder
+ML/

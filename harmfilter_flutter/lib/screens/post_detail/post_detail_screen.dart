@@ -7,7 +7,7 @@ import 'package:harmfilter_flutter/widgets/hf_card.dart';
 import 'package:harmfilter_flutter/widgets/hf_empty_state.dart';
 import 'package:harmfilter_flutter/widgets/hf_theme.dart';
 import 'package:harmfilter_flutter/widgets/hf_avatar.dart';
-import 'package:lucide_icons/lucide_icons.dart';
+import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 class PostDetailScreen extends StatelessWidget {
   final String postId;

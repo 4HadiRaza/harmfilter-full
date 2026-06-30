@@ -14,3 +14,15 @@ A few resources to get you started if this is your first Flutter project:
 For help getting started with Flutter development, view the
 [online documentation](https://docs.flutter.dev/), which offers tutorials,
 samples, guidance on mobile development, and a full API reference.
+
+
+
+1- run flutter 
+
+2- run ngrok 
+ngrok http 8000
+
+3- run backend 
+cd ml models
+ python api_server.py
+
