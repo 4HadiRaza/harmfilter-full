@@ -51,3 +51,7 @@ secrets.json
 .env.local
 
 /secrets.json
+
+# ML Models and Python API Server (large files, run locally)
+/ML/
+ML/
