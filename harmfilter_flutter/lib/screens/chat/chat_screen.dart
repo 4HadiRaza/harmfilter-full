@@ -32,7 +32,7 @@ class _ChatScreenState extends State<ChatScreen> {
       debugPrint('No GEMINI_API_KEY found in .env');
     }
     _model = GenerativeModel(
-      model: 'gemini-flash-latest',
+      model: 'gemini-3.5-flash',
       apiKey: apiKey ?? '',
       systemInstruction: Content.system(
           'You are Compassion Coach, but act like a helpful student friend, not a polished corporate AI. '
