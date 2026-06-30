@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:lucide_icons/lucide_icons.dart';
+import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:harmfilter_flutter/widgets/hf_button.dart';
 import 'package:harmfilter_flutter/widgets/hf_card.dart';

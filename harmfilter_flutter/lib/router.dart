@@ -4,6 +4,7 @@ import 'package:harmfilter_flutter/screens/auth/login_screen.dart';
 import 'package:harmfilter_flutter/screens/auth/signup_screen.dart';
 import 'package:harmfilter_flutter/screens/auth/forgot_password_screen.dart';
 import 'package:harmfilter_flutter/screens/dashboard/dashboard_screen.dart';
+import 'package:harmfilter_flutter/screens/dashboard/filtered_posts_screen.dart';
 import 'package:harmfilter_flutter/screens/analyze/analyze_screen.dart';
 import 'package:harmfilter_flutter/screens/leaderboard/leaderboard_screen.dart';
 import 'package:harmfilter_flutter/screens/learn/learn_screen.dart';
@@ -50,6 +51,13 @@ final GoRouter router = GoRouter(
         GoRoute(
           path: '/dashboard',
           builder: (context, state) => const DashboardScreen(),
+        ),
+        GoRoute(
+          path: '/filtered-posts/:filter',
+          builder: (context, state) {
+            final filter = state.pathParameters['filter'] ?? 'all';
+            return FilteredPostsScreen(filter: filter);
+          },
         ),
         GoRoute(
           path: '/analyze',

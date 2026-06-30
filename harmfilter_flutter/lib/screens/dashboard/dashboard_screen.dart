@@ -13,7 +13,7 @@ import 'package:harmfilter_flutter/widgets/hf_empty_state.dart';
 import 'package:harmfilter_flutter/widgets/hf_theme.dart';
 import 'package:harmfilter_flutter/widgets/report_post_sheet.dart';
 import 'package:intl/intl.dart';
-import 'package:lucide_icons/lucide_icons.dart';
+import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:provider/provider.dart';
 
 class DashboardScreen extends StatefulWidget {
@@ -284,6 +284,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
       children: [
         HFCard(
           padding: const EdgeInsets.all(20),
+          onTap: () => context.push('/filtered-posts/safe'),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -350,23 +351,44 @@ class _DashboardScreenState extends State<DashboardScreen> {
               Row(
                 children: [
                   Expanded(
-                    child: _buildMiniStat(
-                      'Posts Analyzed',
-                      data.totalPostsAnalyzed.toString(),
+                    child: InkWell(
+                      onTap: () => context.push('/filtered-posts/all'),
+                      borderRadius: BorderRadius.circular(4),
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 4),
+                        child: _buildMiniStat(
+                          'Posts Analyzed',
+                          data.totalPostsAnalyzed.toString(),
+                        ),
+                      ),
                     ),
                   ),
                   _buildMiniDivider(),
                   Expanded(
-                    child: _buildMiniStat(
-                      'Warnings Issued',
-                      data.totalWarnings.toString(),
+                    child: InkWell(
+                      onTap: () => context.push('/filtered-posts/flagged'),
+                      borderRadius: BorderRadius.circular(4),
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 4),
+                        child: _buildMiniStat(
+                          'Warnings Issued',
+                          data.totalWarnings.toString(),
+                        ),
+                      ),
                     ),
                   ),
                   _buildMiniDivider(),
                   Expanded(
-                    child: _buildMiniStat(
-                      'Your Points',
-                      data.userProfile.points.toString(),
+                    child: InkWell(
+                      onTap: () => context.go('/learn'),
+                      borderRadius: BorderRadius.circular(4),
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 4),
+                        child: _buildMiniStat(
+                          'Your Points',
+                          data.userProfile.points.toString(),
+                        ),
+                      ),
                     ),
                   ),
                 ],
@@ -382,6 +404,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 'Total Flags',
                 data.totalWarnings.toString(),
                 LucideIcons.flag,
+                onTap: () => context.push('/filtered-posts/flagged'),
               ),
             ),
             const SizedBox(width: 12),
@@ -390,6 +413,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 'Safe Posts',
                 data.totalSafePosts.toString(),
                 LucideIcons.shieldCheck,
+                onTap: () => context.push('/filtered-posts/safe'),
               ),
             ),
           ],
@@ -440,7 +464,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
     );
   }
 
-  Widget _buildStatTile(String label, String value, IconData icon) {
+  Widget _buildStatTile(String label, String value, IconData icon, {VoidCallback? onTap}) {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
 
@@ -448,6 +472,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
       backgroundColor: isDark ? HFTheme.elevated : theme.cardColor,
       borderColor: theme.dividerColor,
       padding: const EdgeInsets.all(16),
+      onTap: onTap,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
