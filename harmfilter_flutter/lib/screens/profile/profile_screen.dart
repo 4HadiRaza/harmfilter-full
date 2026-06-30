@@ -283,6 +283,7 @@ class ProfileScreen extends StatelessWidget {
               name: post.username,
               content: post.text,
               label: post.label,
+              imageUrl: post.imageUrl,
               postId: post.id,
               onDelete: () => _deletePost(context, post.id),
               onReport: () => showReportPostSheet(
@@ -311,6 +312,7 @@ class ProfileScreen extends StatelessWidget {
     required String name,
     required String content,
     String? label,
+    String? imageUrl,
     required String postId,
     required VoidCallback onDelete,
     required VoidCallback onReport,
@@ -376,16 +378,67 @@ class ProfileScreen extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
-                    content,
-                    maxLines: 4,
-                    overflow: TextOverflow.ellipsis,
-                    style: GoogleFonts.inter(
-                      color: HFTheme.primaryTextColor(context),
-                      fontSize: 14,
-                      height: 1.4,
+                  if (content.trim().isNotEmpty) ...[
+                    Text(
+                      content,
+                      maxLines: 4,
+                      overflow: TextOverflow.ellipsis,
+                      style: GoogleFonts.inter(
+                        color: HFTheme.primaryTextColor(context),
+                        fontSize: 14,
+                        height: 1.4,
+                      ),
                     ),
-                  ),
+                  ],
+                  if (imageUrl != null && imageUrl.isNotEmpty) ...[
+                    const SizedBox(height: 10),
+                    ClipRRect(
+                      borderRadius: BorderRadius.circular(8),
+                      child: Image.network(
+                        imageUrl,
+                        width: double.infinity,
+                        fit: BoxFit.contain,
+                        loadingBuilder: (context, child, progress) {
+                          if (progress == null) return child;
+                          return Container(
+                            width: double.infinity,
+                            height: 120,
+                            decoration: BoxDecoration(
+                              color: HFTheme.inputFillColor(context),
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            child: Center(
+                              child: CircularProgressIndicator(
+                                color: HFTheme.accent,
+                                strokeWidth: 2,
+                                value: progress.expectedTotalBytes != null
+                                    ? progress.cumulativeBytesLoaded /
+                                        progress.expectedTotalBytes!
+                                    : null,
+                              ),
+                            ),
+                          );
+                        },
+                        errorBuilder: (context, error, stackTrace) {
+                          return Container(
+                            width: double.infinity,
+                            height: 80,
+                            decoration: BoxDecoration(
+                              color: HFTheme.inputFillColor(context),
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            child: Center(
+                              child: Icon(
+                                LucideIcons.imageOff,
+                                color: HFTheme.secondaryTextColor(context),
+                                size: 24,
+                              ),
+                            ),
+                          );
+                        },
+                      ),
+                    ),
+                  ],
                   if (label != null && label != 'normal') ...[
                     const SizedBox(height: 8),
                     Container(
